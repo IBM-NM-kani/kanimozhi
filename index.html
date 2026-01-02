@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CRUD App</title>
+</head>
+<body>
+
+<h2>CRUD Application</h2>
+
+<input type="text" id="name" placeholder="Name">
+<input type="number" id="age" placeholder="Age">
+<input type="text" id="city" placeholder="City">
+<button onclick="addUser()">Add User</button>
+
+<h3>User List</h3>
+<ul id="userList"></ul>
+
+<script>
+const api = "http://localhost:3000/users";
+
+// CREATE
+function addUser() {
+  fetch(api, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: name.value,
+      age: age.value,
+      city: city.value
+    })
+  }).then(() => getUsers());
+}
+
+// READ
+function getUsers() {
+  fetch(api)
+    .then(res => res.json())
+    .then(data => {
+      userList.innerHTML = "";
+      data.forEach(user => {
+        userList.innerHTML += `
+          <li>
+            ${user.name} - ${user.age} - ${user.city}
+            <button onclick="deleteUser('${user._id}')">Delete</button>
+            <button onclick="updateUser('${user._id}')">Update</button>
+          </li>
+        `;
+      });
+    });
+}
+
+// UPDATE
+function updateUser(id) {
+  fetch(api + "/" + id, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      city: "Updated City"
+    })
+  }).then(() => getUsers());
+}
+
+// DELETE
+function deleteUser(id) {
+  fetch(api + "/" + id, { method: "DELETE" })
+    .then(() => getUsers());
+}
+
+getUsers();
+</script>
+
+</body>
+</html>
